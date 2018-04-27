@@ -7,6 +7,6 @@ script:
 deploy:
   provider: releases
   api_key:
-    secure: $GIT_API_KEY
+    secure: '$GIT_API_KEY'
   file: 'target/rfid-detection-0.0.1-jar-with-dependencies.jar'
   skip_cleanup: true
