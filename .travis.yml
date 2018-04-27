@@ -7,6 +7,6 @@ script:
 deploy:
   provider: releases
   api_key:
-    secure: $GIT_API_KEY
+    secure: "QARpBdT8VzJ/HQCi523ZePDC7NQrMygWzSrGtB2+TIZRyborIn7cZu382EPHc1UspMdG3HFJucfxzEItI1o3wNA/Zc1JUMH5J1sRpUFt/lqWTFdowGWikusGJCwzn9TnybwCO4ZOYLmNmBI3NWEXZIVE1wPj7rLkQFQZPvprM+GybPmxfHMmCCsO78gm30u0lqaWg8YxK0dOgK+tZFvmE6wOKD0CU4iU698zRyix0ZWpMMWhUefqri4KVpkGhuqcMdrgKm7uK8h+KgbcEB0EDH0w8mSZ96/cxz2NYYZuQ9J2vntsRKFvsA/IM4L9xLgwizXWJ53hvzxpMZ2YhdBfWviIhLn9EwYPvsSx9LE5q7toe+jpEe573P2ti4r5bpa9H5LBQDao0btXTYzN9LGD8PZck/LWc7SPyqcFkKFiG8uhmJvcopOUbQerDSWr+8mRWyFSAEkmimMssubpE16S8SW2atpAODRhCA0AyGA6h6gJt4nnz6D6/W8t+mar81cPTfyhPd/4O9WV/8uMMCl9itIa8TyKoRVvChSvwTVDVQV95Xuar5r4wBtu+UwLLfVu60fg3c3fD05/+kxYbdRo9m3mDN6wic2qEwwLdZGChErMcUka++P0a4dy1ugLp4w8JsGiDNWIN6RQ/GdgTz/TUI7CmPLQvVAcJvEs53+AWVk="
   file: 'target/rfid-detection-0.0.1-jar-with-dependencies.jar'
   skip_cleanup: true
