@@ -1,3 +1,12 @@
 language: java
+jdk:
+  - oraclejdk8
 sudo: false
-script: mvn clean verify
+script:
+  - mvn clean verify package
+deploy:
+  provider: releases
+  api_key:
+    secure: $GIT_API_KEY
+  file: 'target/rfid-detection-0.0.1-jar-with-dependencies.jar'
+  skip_cleanup: true
