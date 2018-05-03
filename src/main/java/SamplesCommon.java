@@ -1,7 +1,7 @@
-import com.nordicid.nurapi.NurApiSocketTransport;
-import com.nordicid.nurapi.NurApiTransport;
 import com.nordicid.nurapi.NurApi;
 import com.nordicid.nurapi.NurApiSerialTransport;
+import com.nordicid.nurapi.NurApiSocketTransport;
+import com.nordicid.nurapi.NurApiTransport;
 
 public class SamplesCommon {
 
@@ -17,11 +17,11 @@ public class SamplesCommon {
         //return createSocket("ar8xaabbcc.local", 4333);
 
         // Connect reader over serial port (WINDOWS)
-        return createSerial("COM3", 115200);
+        //return createSerial("COM3", 115200);
 
         // Connect reader over serial port (Linux)
         //return createSerial("/dev/ttyACM0", 115200);
-        //return createSerial("/dev/ttyS0", 115200);
+        return createSerial("/dev/ttyS0", 115200);
         //return createSerial("/dev/ttyAMA0", 115200);
     }
 

@@ -8,7 +8,8 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.ui.RefineryUtilities;
 
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This example shows how to read single tag memory bank content with different singulation methods.
@@ -16,10 +17,12 @@ import java.util.Arrays;
  */
 public class Example {
     static final transient XYSeries series = new XYSeries("Random Data");
+    static final transient Map<String, XYSeries> antennaSeries = new HashMap<String, XYSeries>();
+    final XYSeriesCollection data;
 
     public Example() {
         ApplicationFrame applicationFrame = new ApplicationFrame("Title");
-        final XYSeriesCollection data = new XYSeriesCollection(series);
+        data = new XYSeriesCollection();
         final JFreeChart chart = ChartFactory.createXYLineChart(
                 "XY Series Demo",
                 "X",
@@ -42,6 +45,10 @@ public class Example {
 
     public static void main(String[] args) {
         Example example = new Example();
+        example.init();
+    }
+
+    public void init() {
         NurApi api = null;
 
         try {
@@ -59,7 +66,13 @@ public class Example {
             NurRespReaderInfo nurRespReaderInfo = api.getReaderInfo();
             System.out.println("Got reader information.");
             System.out.println("# of antennas: " + nurRespReaderInfo.numAntennas);
+            AntennaMapping[] antennaMappings = api.getAntennaMapping();
+            System.out.println("# of antenna mappings found: " + antennaMappings.length);
 
+            for (int i = 0; i < antennaMappings.length; ++i)
+                antennaSeries.put(String.valueOf(antennaMappings[i].antennaId), new XYSeries(String.valueOf(antennaMappings[i].antennaId)));
+
+            antennaSeries.forEach((k, v) -> data.addSeries(v));
 
             while (true) {
                 try {
@@ -77,7 +90,7 @@ public class Example {
                             NurTag tag = api.getStorage().get(n);
                             tag.traceTag();
                             if (tag.getEpcString().equals("00000003")) {
-                                series.add(System.nanoTime(), tag.getRssi());
+                                antennaSeries.get(String.valueOf(tag.getAntennaId())).add(System.nanoTime(), tag.getRssi());
                             }
                             System.out.println(String.format("tag[%d] \t EPC '%s' \t RSSI %d \t FREQ: %d \t TIME: %d", n, tag.getEpcString(), tag.getRssi(), tag.getFreq(), tag.getTimestamp()));
                         }
