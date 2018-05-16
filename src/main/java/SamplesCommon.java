@@ -20,8 +20,7 @@ public class SamplesCommon {
         //return createSerial("COM3", 115200);
 
         // Connect reader over serial port (Linux)
-
-        return createSerial("/dev/ttyACM1", 115200);
+        return createSerial("/dev/NordicIdSampoS1", 115200);
         //return createSerial("/dev/ttyS0", 115200);
         //return createSerial("/dev/ttyAMA0", 115200);
     }
