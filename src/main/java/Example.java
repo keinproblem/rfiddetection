@@ -48,102 +48,6 @@ public class Example {
         example.init();
     }
 
-    public void init() {
-        NurApi api = null;
-
-        try {
-            // Create and connect new NurApi object
-            // To change connection parameters, please modify SamplesCommon.java
-            api = SamplesCommon.createAndConnectNurApi();
-            //api.setLogLevel(NurApi.LOG_VERBOSE);
-            api.setListener(apiListener);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return;
-        }
-
-        try {
-            NurRespReaderInfo nurRespReaderInfo = api.getReaderInfo();
-            System.out.println("Got reader information.");
-            System.out.println("# of antennas: " + nurRespReaderInfo.numAntennas);
-            AntennaMapping[] antennaMappings = api.getAntennaMapping();
-            System.out.println("# of antenna mappings found: " + antennaMappings.length);
-
-            for (int i = 0; i < antennaMappings.length; ++i)
-                antennaSeries.put(String.valueOf(antennaMappings[i].antennaId), new XYSeries(String.valueOf(antennaMappings[i].antennaId)));
-
-            antennaSeries.forEach((k, v) -> data.addSeries(v));
-
-            while (true) {
-                try {
-                    System.out.println("Clearing ID Buffer");
-                    api.clearIdBuffer(true);
-                    System.out.println("Retrieving Inventory");
-                    NurRespInventory resp = api.inventory();
-                    System.out.println("Retrieving Inventory Done");
-                    System.out.println("inventory numTagsFound: " + resp.numTagsFound);
-
-                    if (resp.numTagsFound > 0) {
-                        // Fetch and print tags
-                        api.fetchTags();
-                        for (int n = 0; n < api.getStorage().size(); n++) {
-                            NurTag tag = api.getStorage().get(n);
-                            tag.traceTag();
-                            if (tag.getEpcString().equals("00000003")) {
-                                antennaSeries.get(String.valueOf(tag.getAntennaId())).add(System.nanoTime(), tag.getRssi());
-                            }
-                            System.out.println(String.format("tag[%d] \t EPC '%s' \t RSSI %d \t FREQ: %d \t TIME: %d", n, tag.getEpcString(), tag.getRssi(), tag.getFreq(), tag.getTimestamp()));
-                        }
-                    } else {
-                        System.out.println("No Tags found.");
-                    }
-
-
-                    // Set this to match your test tag EPC
-                    //String targetTagEpc = "300833B2DDD9014000000005";
-
-                    // Convert to bytes
-                    //byte []targetEpcData = NurApi.hexStringToByteArray(targetTagEpc);
-
-                    // Read 2words from TID bank, singulated by target EPC
-                    //System.out.println("Read TID from tag " + targetTagEpc);
-                    //byte []tidData = api.readTagByEpc(targetEpcData, targetEpcData.length, NurApi.BANK_TID, 0, 4);
-
-                    // Read back EPC from target tag, singulated by TID 2words
-                    //System.out.println("Read EPC from tag TID " + NurApi.byteArrayToHexString(tidData));
-                    //byte[] readEpcData = api.readTag(NurApi.BANK_EPC, 0, 10);
-                    //if (!Arrays.equals(readEpcData, new byte[10]))
-                    //    System.out.println("Read EPC " + NurApi.byteArrayToHexString(readEpcData));
-                    //System.out.println("Tag EPC Data read: " + NurApi.byteArrayToHexString(readEpcData));
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                }
-                Thread.sleep(50);
-                System.out.println("------------------------------------------------------------------------------------------------------------------------------------");
-            }
-            // Compare original target and read EPC's
-            //if (targetTagEpc.equals(NurApi.byteArrayToHexString(readEpcData))) {
-            //    System.out.println("OK");
-            //}
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.out.println("NOTE: Make sure 'targetTagEpc' match your specific tag EPC");
-        }
-
-        System.out.println("See you again!.");
-        try {
-            // Disconnect the connection
-            api.disconnect();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // Dispose the NurApi
-        api.dispose();
-    }
-
-
     static NurApiListener apiListener = new NurApiListener() {
 
         public void triggeredReadEvent(NurEventTriggeredRead arg0) {
@@ -238,14 +142,119 @@ public class Example {
 
 
         public void tagTrackingChangeEvent(NurEventTagTrackingChange arg0) {
-            //System.out.println("tagTrackingChangeEvent readSource :" + arg0.readSource);
+            System.out.println("tagTrackingChangeEvent readSource :" + arg0);
 
         }
 
 
         public void tagTrackingScanEvent(NurEventTagTrackingData arg0) {
-            //System.out.println("tagTrackingScanEvent: " + arg0);
-
+            System.out.println("tagTrackingScanEvent: " + arg0);
         }
     };
+
+    public void init() {
+        NurApi api = null;
+
+        try {
+            // Create and connect new NurApi object
+            // To change connection parameters, please modify SamplesCommon.java
+            api = SamplesCommon.createAndConnectNurApi();
+            //api.setLogLevel(NurApi.LOG_VERBOSE);
+            api.setListener(apiListener);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return;
+        }
+
+        try {
+            NurRespReaderInfo nurRespReaderInfo = api.getReaderInfo();
+            System.out.println("Got reader information.");
+            System.out.println("# of antennas: " + nurRespReaderInfo.numAntennas);
+            AntennaMapping[] antennaMappings = api.getAntennaMapping();
+            System.out.println("# of antenna mappings found: " + antennaMappings.length);
+
+            NurTagTrackingConfig nurTagTrackingConfig = new NurTagTrackingConfig();
+            api.addUnknownEventListener(new NurApiUnknownEventListener() {
+                @Override
+                public void handleUnknownEvent(NurEventUnknown nurEventUnknown) {
+                    System.out.println("Unknown event received: " + new String(nurEventUnknown.mEventData));
+                }
+            });
+            nurTagTrackingConfig.events = NurApi.NUR_TTEV_INOUT | NurApi.NUR_TTEV_VISIBILITY | NurApi.NUR_TTEV_ANTENNA;
+
+
+
+            for (int i = 0; i < antennaMappings.length; ++i)
+                antennaSeries.put(String.valueOf(antennaMappings[i].antennaId), new XYSeries(String.valueOf(antennaMappings[i].antennaId)));
+
+            antennaSeries.forEach((k, v) -> data.addSeries(v));
+
+            while (true) {
+                try {
+                    System.out.println("Clearing ID Buffer");
+                    api.clearIdBuffer(true);
+                    System.out.println("Retrieving Inventory");
+                    NurRespInventory resp = api.inventory();
+                    System.out.println("Retrieving Inventory Done");
+                    System.out.println("inventory numTagsFound: " + resp.numTagsFound);
+
+                    if (resp.numTagsFound > 0) {
+                        // Fetch and print tags
+                        api.fetchTags();
+                        for (int n = 0; n < api.getStorage().size(); n++) {
+                            NurTag tag = api.getStorage().get(n);
+                            tag.traceTag();
+                            if (tag.getEpcString().equals("00000003")) {
+                                antennaSeries.get(String.valueOf(tag.getAntennaId())).add(System.nanoTime(), tag.getRssi());
+                            }
+                            System.out.println(String.format("tag[%d] \t EPC '%s' \t RSSI %d \t FREQ: %d \t TIME: %d", n, tag.getEpcString(), tag.getRssi(), tag.getFreq(), tag.getTimestamp()));
+                        }
+                    } else {
+                        System.out.println("No Tags found.");
+                    }
+
+
+                    // Set this to match your test tag EPC
+                    //String targetTagEpc = "300833B2DDD9014000000005";
+
+                    // Convert to bytes
+                    //byte []targetEpcData = NurApi.hexStringToByteArray(targetTagEpc);
+
+                    // Read 2words from TID bank, singulated by target EPC
+                    //System.out.println("Read TID from tag " + targetTagEpc);
+                    //byte []tidData = api.readTagByEpc(targetEpcData, targetEpcData.length, NurApi.BANK_TID, 0, 4);
+
+                    // Read back EPC from target tag, singulated by TID 2words
+                    //System.out.println("Read EPC from tag TID " + NurApi.byteArrayToHexString(tidData));
+                    //byte[] readEpcData = api.readTag(NurApi.BANK_EPC, 0, 10);
+                    //if (!Arrays.equals(readEpcData, new byte[10]))
+                    //    System.out.println("Read EPC " + NurApi.byteArrayToHexString(readEpcData));
+                    //System.out.println("Tag EPC Data read: " + NurApi.byteArrayToHexString(readEpcData));
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+                Thread.sleep(50);
+                System.out.println("------------------------------------------------------------------------------------------------------------------------------------");
+            }
+            // Compare original target and read EPC's
+            //if (targetTagEpc.equals(NurApi.byteArrayToHexString(readEpcData))) {
+            //    System.out.println("OK");
+            //}
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.out.println("NOTE: Make sure 'targetTagEpc' match your specific tag EPC");
+        }
+
+        System.out.println("See you again!.");
+        try {
+            // Disconnect the connection
+            api.disconnect();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Dispose the NurApi
+        api.dispose();
+    }
 }
