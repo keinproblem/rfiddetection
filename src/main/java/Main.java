@@ -1,108 +1,35 @@
-import nurapi.NurApiLibrary;
+import connector.ConnectorStrategy;
+import connector.DummyToFileConnector;
 import org.bridj.BridJ;
 import org.bridj.Platform;
-import org.bridj.Pointer;
+
+import java.nio.file.Paths;
+import java.util.EventListener;
 
 public class Main {
     public static void main(String[] args) {
-        new DetectionService();
         System.out.println(System.getProperty("java.library.path"));
+
+        determineLibraryAlias();
+
+        ConnectorStrategy connectorStrategy = new DummyToFileConnector(Paths.get("testfile.txt"));
         NativeBridge nativeBridge = new NativeBridge();
-        nativeBridge.initTracking(new TagTrackingParameter());
+        Configurator configurator = new Configurator();
+        DetectionService detectionService = new DetectionService(connectorStrategy, nativeBridge, configurator);
+
+        System.out.println(detectionService.isTrackingRunning());
+        detectionService.registerEventListener(new EventListener() {
+        });
+        detectionService.connect();
+        detectionService.initTagTracking();
+
+        //nativeBridge.initTracking(new TagTrackingParameter());
         //System.loadLibrary("NURAPI");
-        NurApiLibrary nurApiLibrary = new NurApiLibrary();
+        /*NurApiLibrary nurApiLibrary = new NurApiLibrary();
         Pointer p = NurApiLibrary.NurApiCreate();
 
 
-        NurApiLibrary.NurApiSetNotificationCallback(p, Pointer.getPointer(new NurApiLibrary.NotificationCallback() {
 
-            @Override
-            public void apply(Pointer hApi, int timestamp, int type, Pointer data, int dataLen) {
-
-
-                byte[] bb = data.getBytes(dataLen);
-                System.out.println(new String(bb));
-
-                //System.out.println(data.getString(Pointer.StringType.C, Charset.forName("UTF-8")));
-
-
-                if (NurApiLibrary.NUR_NOTIFICATION.NUR_NOTIFICATION_LOG.value == type) {
-                    //System.out.println(data.toString());
-                    //System.out.println(data.getString(Pointer.StringType.C));
-                }
-
-                if (NurApiLibrary.NUR_NOTIFICATION.NUR_NOTIFICATION_PERIODIC_INVENTORY.value == type) {
-                }
-
-
-                if (NurApiLibrary.NUR_NOTIFICATION.NUR_NOTIFICATION_TRDISCONNECTED.value == type) {
-
-                }
-
-                if (NurApiLibrary.NUR_NOTIFICATION.NUR_NOTIFICATION_MODULEBOOT.value == type) {
-
-                }
-
-                if (NurApiLibrary.NUR_NOTIFICATION.NUR_NOTIFICATION_TRCONNECTED.value == type) {
-
-                }
-
-                if (NurApiLibrary.NUR_NOTIFICATION.NUR_NOTIFICATION_TRACETAG.value == type) {
-                }
-
-
-                if (NurApiLibrary.NUR_NOTIFICATION.NUR_NOTIFICATION_IOCHANGE.value == type) {
-                }
-
-
-                if (NurApiLibrary.NUR_NOTIFICATION.NUR_NOTIFICATION_TRIGGERREAD.value == type) {
-                }
-
-
-                if (NurApiLibrary.NUR_NOTIFICATION.NUR_NOTIFICATION_HOPEVENT.value == type) {
-                }
-
-
-                if (NurApiLibrary.NUR_NOTIFICATION.NUR_NOTIFICATION_INVENTORYSTREAM.value == type) {
-                }
-
-
-                if (NurApiLibrary.NUR_NOTIFICATION.NUR_NOTIFICATION_INVENTORYEX.value == type) {
-                }
-
-
-                if (NurApiLibrary.NUR_NOTIFICATION.NUR_NOTIFICATION_DEVSEARCH.value == type) {
-                }
-
-
-                if (NurApiLibrary.NUR_NOTIFICATION.NUR_NOTIFICATION_CLIENTCONNECTED.value == type) {
-                }
-
-
-                if (NurApiLibrary.NUR_NOTIFICATION.NUR_NOTIFICATION_CLIENTDISCONNECTED.value == type) {
-                }
-
-
-                if (NurApiLibrary.NUR_NOTIFICATION.NUR_NOTIFICATION_EASALARM.value == type) {
-                }
-
-
-                if (NurApiLibrary.NUR_NOTIFICATION.NUR_NOTIFICATION_EPCENUM.value == type) {
-                }
-
-
-                if (NurApiLibrary.NUR_NOTIFICATION.NUR_NOTIFICATION_EXTIN.value == type) {
-                }
-
-
-                if (NurApiLibrary.NUR_NOTIFICATION.NUR_NOTIFICATION_GENERAL.value == type) {
-                }
-
-                if (NurApiLibrary.NUR_NOTIFICATION.NUR_NOTIFICATION_TT_CHANGED.value == type) {
-                }
-
-            }
-        }));
 
         NurApiLibrary.NurApiSetLogLevel(p, (int) NurApiLibrary.NUR_LOG.NUR_LOG_ALL.value);
 
@@ -124,7 +51,7 @@ public class Main {
         Pointer<Byte> s = Pointer.pointerToBytes(devPathStr.getBytes());
         Pointer pp = Pointer.pointerToCString(devPathStr);
         NurApiLibrary.NurApiConnectSerialPortEx(p, pp, NurApiLibrary.NUR_DEFAULT_BAUDRATE);
-
+        */
        /* NurApiLibrary nurApi = (NurApiLibrary) Native.loadLibrary(
                 Platform.isWindows() ? "NURAPI": "NurApiRaspi",NurApiLibrary.class);
         System.out.println(System.getProperty("java.library.path"));
