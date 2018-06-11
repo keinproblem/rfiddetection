@@ -8,8 +8,8 @@ import java.util.EventListener;
 
 public class Main {
     public static void main(String[] args) {
+        System.out.println("START");
         System.out.println(System.getProperty("java.library.path"));
-
         determineLibraryAlias();
 
         ConnectorStrategy connectorStrategy = new DummyToFileConnector(Paths.get("testfile.txt"));
@@ -94,10 +94,13 @@ public class Main {
             }
         } else {
             if (Platform.isArm()) {
+                System.out.println("Loading raspi");
                 BridJ.addNativeLibraryAlias("NurApi", "libNurApiRaspi");
             } else if (Platform.is64Bits()) {
+                System.out.println("Loading linux x64");
                 BridJ.addNativeLibraryAlias("NurApi", "libNurApix64");
             } else {
+                System.out.println("Loading linux x86");
                 BridJ.addNativeLibraryAlias("NurApi", "libNurApix86");
             }
         }

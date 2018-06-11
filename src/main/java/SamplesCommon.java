@@ -17,10 +17,10 @@ public class SamplesCommon {
         //return createSocket("ar8xaabbcc.local", 4333);
 
         // Connect reader over serial port (WINDOWS)
-        //return createSerial("COM3", 115200);
+        return createSerial("COM3", 115200);
 
         // Connect reader over serial port (Linux)
-        return createSerial("/dev/NordicIdSampoS1", 115200);
+        //return createSerial("/dev/NordicIdSampoS1", 115200);
         //return createSerial("/dev/ttyS0", 115200);
         //return createSerial("/dev/ttyAMA0", 115200);
     }

@@ -183,7 +183,6 @@ public class Example {
             nurTagTrackingConfig.events = NurApi.NUR_TTEV_INOUT | NurApi.NUR_TTEV_VISIBILITY | NurApi.NUR_TTEV_ANTENNA;
 
 
-
             for (int i = 0; i < antennaMappings.length; ++i)
                 antennaSeries.put(String.valueOf(antennaMappings[i].antennaId), new XYSeries(String.valueOf(antennaMappings[i].antennaId)));
 
