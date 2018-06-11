@@ -1,4 +1,4 @@
-package connector;
+package core;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -14,7 +14,7 @@ public class AlertEvent implements Serializable {
     private Direction direction;
     private Instant detectionTime;
     ;
-    private String EPC;
+    private byte[] epc;
 
     private AlertEvent() {
     }

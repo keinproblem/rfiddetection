@@ -1,11 +1,6 @@
 package core;
 
-import com.nordicid.nurapi.*;
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
-
-import java.util.concurrent.atomic.AtomicBoolean;
-
+/*
 @Slf4j
 public class ReaderSetup {
     private final NurApi nurApi;
@@ -38,13 +33,14 @@ public class ReaderSetup {
      *
      * @throws Exception
      */
+/*
     public void connect() throws Exception {
         this.nurApi.connect();
         this.atomicBoolean.set(true);
     }
 
-    public void registerReaderEventListener(final ReaderEventListener readerEventListener) {
-        this.nurApi.setListener(readerEventListener);
+    public void registerReaderEventListener(final NurApiEventListener nurApiEventListener) {
+        this.nurApi.setListener(nurApiEventListener);
     }
 
     private void autoTune() {
@@ -63,7 +59,7 @@ public class ReaderSetup {
         //NurRespInventory nurRespInventory = this.nurApi.inventorySelect(0,7, NurApi.SESSION_S0,true,NurApi.BANK_EPC,0,0,new byte[0]);
         //this.nurApi.startInventoryStream();
         NurTagStorage apiStorage = this.nurApi.getStorage();
-        this.registerReaderEventListener(new ReaderEventListener(apiStorage, this.nurApi));
+        this.registerReaderEventListener(new NurApiEventListener(apiStorage, this.nurApi));
 
         this.nurApi.traceTagByEpc(new byte[]{0x00});
 
@@ -74,7 +70,8 @@ public class ReaderSetup {
                 log.info(String.format("tag[%d] \t EPC '%s' \t RSSI %d \t antennaID: [%d] \t physicalAntenna: [%s] \t FREQ: %d \t TIME: %d", n, tag.getEpcString(), tag.getRssi(), tag.getAntennaId(), tag.getPhysicalAntenna(),  tag.getFreq(), tag.getTimestamp()));
             }
             this.nurApi.clearIdBuffer();*/
-            Thread.sleep(100);
+
+/*            Thread.sleep(100);
         }
 
 /*        NurTagTrackingConfig nurTagTrackingConfig = new NurTagTrackingConfig();
@@ -124,6 +121,7 @@ public class ReaderSetup {
         //NurCmdTagTracking nurCmdTagTracking = new NurCmdTagTracking(nurTagTrackingConfig, 7, 0, 1);
         //NurPacket.write(this.nurApiTransport,nurCmdTagTracking);
 
-
+/*
     }
 }
+*/

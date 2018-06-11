@@ -1,15 +1,16 @@
+package core;
 
-public interface ApiDelegate {
+public interface ApiFacade {
 
     void connect(final String devPath, final int baudRate);
 
     void connect(final String devPath);
 
-    void initTracking(final TagTrackingParameter tagTrackingParameter);
+    void initTracking();
 
     boolean isTagTrackingRunning();
 
     void stopTracking();
 
-    void registerCallbackListener();
+    void registerAlertEventCallbackListener(final AlertEventListener alertEventListener);
 }

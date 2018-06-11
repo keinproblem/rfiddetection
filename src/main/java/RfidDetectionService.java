@@ -1,22 +1,28 @@
-import core.ReaderSetup;
-import lombok.extern.slf4j.Slf4j;
+import core.AlertEventListener;
+import core.ApiFacade;
 
-@Slf4j
 public class RfidDetectionService {
-    private final ReaderSetup readerSetup;
+    private final ApiFacade apiFacade;
 
-    public RfidDetectionService() {
-        final String devicePath;
-        if (System.getProperty("os.name").endsWith("x")) {
-            devicePath = "/dev/NordicIdSampoS1";
-        } else {
-            devicePath = "COM3";
-        }
-        this.readerSetup = new ReaderSetup(devicePath, 115200, 2);
+    public RfidDetectionService(ApiFacade apiFacade) {
+        this.apiFacade = apiFacade;
     }
 
-    public void init() {
-        log.info("Initializing RFID Detection Service");
+    public void init(final String devPath) {
+        this.apiFacade.connect(devPath);
+        this.initTagTracking();
+    }
 
+    public void autoTuneReader() {
+
+    }
+
+
+    private void initTagTracking() {
+        this.apiFacade.initTracking();
+    }
+
+    public void addExternalAlertEventListener(final AlertEventListener alertEventListener) {
+        this.apiFacade.registerAlertEventCallbackListener(alertEventListener);
     }
 }

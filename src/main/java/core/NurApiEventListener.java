@@ -3,37 +3,25 @@ package core;
 import com.nordicid.nurapi.*;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 @Slf4j
-public class ReaderEventListener implements NurApiListener {
-    private final NurTagStorage nurTagStorage;
-    private final NurApi nurApi;
-    private AtomicLong atomicLong = new AtomicLong();
-
-    public ReaderEventListener(NurTagStorage nurTagStorage, NurApi nurApi) {
-        this.nurTagStorage = nurTagStorage;
-        this.nurApi = nurApi;
-    }
-
-
+public class NurApiEventListener implements NurApiListener {
     @Override
-    public void logEvent(int i, String s) {
-        switch (i) {
+    public void logEvent(int loglevel, String content) {
+        switch (loglevel) {
             case NurApi.LOG_DATA:
-                log.debug(s);
+                log.debug(content);
                 break;
             case NurApi.LOG_VERBOSE:
-                log.trace(s);
+                log.trace(content);
                 break;
             case NurApi.LOG_USER:
-                log.info(s);
+                log.info(content);
                 break;
             case NurApi.LOG_ERROR:
-                log.error(s);
+                log.error(content);
                 break;
             default:
-                log.debug(s);
+                log.debug(content);
                 break;
         }
     }
@@ -45,7 +33,7 @@ public class ReaderEventListener implements NurApiListener {
 
     @Override
     public void disconnectedEvent() {
-        log.info("Disconnected to reader.");
+        log.info("Disconnected from reader.");
     }
 
     @Override
@@ -55,25 +43,6 @@ public class ReaderEventListener implements NurApiListener {
 
     @Override
     public void inventoryStreamEvent(NurEventInventory nurEventInventory) {
-        log.info("tags added: " + nurEventInventory.tagsAdded);
-        /*log.info("stopped: " + nurEventInventory.stopped);
-        synchronized (this.nurTagStorage) {
-            // Add inventoried tags to our unique tag storage
-            for (int n=0; n<this.nurTagStorage.size(); n++) {
-                NurTag tag = this.nurTagStorage.get(n);
-                log.info(String.format("tag[%d] \t EPC '%s' \t RSSI %d \t antennaID: [%d] \t physicalAntenna: [%s] \t FREQ: %d \t TIME: %d", n, tag.getEpcString(), tag.getRssi(), tag.getAntennaId(), tag.getPhysicalAntenna(),  tag.getFreq(), tag.getTimestamp()));
-            }
-        }
-        atomicLong.incrementAndGet();
-        if (nurEventInventory.stopped) {
-            try {
-                System.out.println("Restarting stream");
-                this.nurApi.startInventoryStream();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }*/
-        log.info("--------------------------------------------------------------------------------------------------");
     }
 
     @Override
@@ -138,7 +107,7 @@ public class ReaderEventListener implements NurApiListener {
 
     @Override
     public void autotuneEvent(NurEventAutotune nurEventAutotune) {
-
+        log.info(String.format("Performing antenna auto antenna: %d cap1: %d cap2: %d freqKhz: %d reflPower_dBm: %d", nurEventAutotune.antenna, nurEventAutotune.cap1, nurEventAutotune.cap2, nurEventAutotune.freqKhz, nurEventAutotune.reflPower_dBm));
     }
 
     @Override
