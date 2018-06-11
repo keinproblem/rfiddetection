@@ -1307,7 +1307,7 @@ public class NurApiLibrary {
      * Original signature : <code>int NurApiConnectSerialPortEx(HANDLE, const TCHAR*, int)</code><br>
      * <i>native declaration : nur_sdk-master\native\include\NurAPI.h:1156</i>
      */
-    public static int NurApiConnectSerialPortEx(Pointer<?> hApi, Pointer<Byte> portName, int baudRate) {
+    public static int NurApiConnectSerialPortEx(Pointer<?> hApi, Pointer<?> portName, int baudRate) {
         return NurApiConnectSerialPortEx(Pointer.getPeer(hApi), Pointer.getPeer(portName), baudRate);
     }
 

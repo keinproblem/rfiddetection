@@ -1,8 +1,8 @@
-import com.sun.jna.Native;
 import nurapi.NUR_TAGTRACKING_CONFIG;
 import nurapi.NUR_TT_TAG;
 import nurapi.NurApiLibrary;
 import org.bridj.BridJ;
+import org.bridj.Platform;
 import org.bridj.Pointer;
 
 /**
@@ -34,9 +34,12 @@ public class NativeBridge implements ApiDelegate {
         return NurApiLibrary.NUR_ERRORCODES.NUR_ERROR_GENERAL;
     }
 
-    @Override
-    public void connect(String devPath, int baudRate) {
-        NurApiLibrary.NurApiConnectSerialPortEx(nativeNurApiInstancePointer, Pointer.pointerToCString(devPath), baudRate);
+    private static String fromPointer(final Pointer<?> pointer) {
+        if (Platform.isWindows()) {
+            return pointer.getWideCString();
+        } else {
+            return pointer.getCString();
+        }
     }
 
     @Override
@@ -72,6 +75,19 @@ public class NativeBridge implements ApiDelegate {
         System.out.println(nurErrorCodeFromInt(startTagTrackingResult).name());
     }
 
+    private static Pointer<?> fromString(final String string) {
+        if (Platform.isWindows()) {
+            return Pointer.pointerToWideCString(string);
+        } else {
+            return Pointer.pointerToCString(string);
+        }
+    }
+
+    @Override
+    public void connect(String devPath, int baudRate) {
+        NurApiLibrary.NurApiConnectSerialPortEx(nativeNurApiInstancePointer, fromString(devPath), baudRate);
+    }
+
     @Override
     public void registerCallbackListener() {
 
@@ -81,11 +97,12 @@ public class NativeBridge implements ApiDelegate {
             public void apply(Pointer hApi, int timestamp, int type, Pointer data, int dataLen) {
 
                 //System.out.println(new String(data.getBytes(dataLen), Charset.forName("US-ASCII")));
-                System.out.println(data.getCString());
-                System.out.println(data.getWideCString());
+                //System.out.println(data.getCString());
+                //System.out.println(data.getWideCString());
                 //System.out.println(data.getString(Pointer.StringType.C, Charset.forName("UTF-8")));
-                System.out.println(Native.toString(data.getBytes(dataLen)));
-                System.out.println(Native.toString(data.getChars(dataLen)));
+                //System.out.println(Native.toString(data.getBytes(dataLen)));
+                //System.out.println(Native.toString(data.getChars(dataLen)));
+                System.out.println(fromPointer(data));
                 if (NurApiLibrary.NUR_NOTIFICATION.NUR_NOTIFICATION_LOG.value == type) {
                     //System.out.println(data.toString());
                     //System.out.println(data.getString(Pointer.StringType.C));
