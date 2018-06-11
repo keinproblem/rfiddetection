@@ -13,7 +13,8 @@ public class Main {
         determineLibraryAlias();
 
         ConnectorStrategy connectorStrategy = new DummyToFileConnector(Paths.get("testfile.txt"));
-        NativeBridge nativeBridge = new NativeBridge();
+        //TODO use custom implementation with java nur sdk
+        ApiDelegate nativeBridge = null;
         Configurator configurator = new Configurator();
         DetectionService detectionService = new DetectionService(connectorStrategy, nativeBridge, configurator);
 
