@@ -2,7 +2,6 @@ import nurapi.NUR_TAGTRACKING_CONFIG;
 import nurapi.NUR_TT_TAG;
 import nurapi.NurApiLibrary;
 import org.bridj.BridJ;
-import org.bridj.Platform;
 import org.bridj.Pointer;
 
 /**
@@ -35,11 +34,11 @@ public class NativeBridge implements ApiDelegate {
     }
 
     private static String fromPointer(final Pointer<?> pointer) {
-        if (Platform.isWindows()) {
-            return pointer.getWideCString();
-        } else {
-            return pointer.getCString();
-        }
+        return pointer.getCString();
+    }
+
+    private static Pointer<Byte> fromPointer(final String string) {
+        return Pointer.pointerToCString(string);
     }
 
     @Override
@@ -75,17 +74,9 @@ public class NativeBridge implements ApiDelegate {
         System.out.println(nurErrorCodeFromInt(startTagTrackingResult).name());
     }
 
-    private static Pointer<?> fromString(final String string) {
-        if (Platform.isWindows()) {
-            return Pointer.pointerToWideCString(string);
-        } else {
-            return Pointer.pointerToCString(string);
-        }
-    }
-
     @Override
     public void connect(String devPath, int baudRate) {
-        NurApiLibrary.NurApiConnectSerialPortEx(nativeNurApiInstancePointer, fromString(devPath), baudRate);
+        NurApiLibrary.NurApiConnectSerialPortEx(nativeNurApiInstancePointer, fromPointer(devPath), baudRate);
     }
 
     @Override

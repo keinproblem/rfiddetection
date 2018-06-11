@@ -22,7 +22,13 @@ public class Main {
         });
         detectionService.connect();
         detectionService.initTagTracking();
-
+        while (true) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         //nativeBridge.initTracking(new TagTrackingParameter());
         //System.loadLibrary("NURAPI");
         /*NurApiLibrary nurApiLibrary = new NurApiLibrary();
