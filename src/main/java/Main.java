@@ -1,6 +1,7 @@
 import connector.AlertEventForwarder;
 import connector.ConnectorStrategy;
 import connector.DummyToFileConnector;
+import connector.PraesentationConnector;
 import core.ApiFacade;
 import core.NurApiWrapper;
 import core.TagTrackingParameter;
@@ -15,7 +16,8 @@ public class Main {
     public static void main(String[] args) {
         log.info("Starting RFID Detection");
 
-        final ConnectorStrategy connectorStrategy = new DummyToFileConnector(Paths.get("testfile.txt"));
+        //final ConnectorStrategy connectorStrategy = new DummyToFileConnector(Paths.get("testfile.txt"));
+        final ConnectorStrategy connectorStrategy = new PraesentationConnector();
         final AlertEventForwarder alertEventForwarder = new AlertEventForwarder(connectorStrategy);
 
         final List<Integer> inAntennas = new LinkedList<>();

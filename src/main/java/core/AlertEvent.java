@@ -2,6 +2,7 @@ package core;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 
 import java.io.Serializable;
@@ -11,10 +12,9 @@ import java.time.Instant;
 @EqualsAndHashCode
 @AllArgsConstructor
 public class AlertEvent implements Serializable {
-    private Direction direction;
-    private Instant detectionTime;
-    ;
-    private byte[] epc;
+    @Getter private Direction direction;
+    @Getter private Instant detectionTime;
+    @Getter private byte[] epc;
 
     private AlertEvent() {
     }
