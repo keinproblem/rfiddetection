@@ -11,7 +11,7 @@ public class Presentation {
     public Presentation() {
         JFrame presentationFrame = new JFrame("Studienarbeit Präsentation");
         presentationFrame.setContentPane(pnlMain);
-        presentationFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        presentationFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         presentationFrame.pack();
         presentationFrame.setVisible(true);
     }
