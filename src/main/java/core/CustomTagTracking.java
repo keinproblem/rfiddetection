@@ -105,7 +105,13 @@ public class CustomTagTracking implements Runnable {
             case A: {
                 if (virtualTrackingTag.isPassedGateB()) {
                     //System.out.println("############ DIRECTION 1");
+                    try {
+                        this.nurApi.beep();
+                    } catch (Exception e) {
+                        log.warn("Failed beeping: ", e);
+                    }
                     AlertEvent alertEvent = new AlertEvent(AlertEvent.Direction.FORWARD, Instant.now(), virtualTrackingTag.getEpc());
+                    log.info(alertEvent.toString());
                     this.publishAlertEvent(alertEvent);
                 }
                 //System.out.println("AREA: 1");
@@ -115,7 +121,13 @@ public class CustomTagTracking implements Runnable {
             break;
             case B: {
                 if (virtualTrackingTag.isPassedGateA()) {
+                    try {
+                        this.nurApi.beep();
+                    } catch (Exception e) {
+                        log.warn("Failed beeping: ", e);
+                    }
                     AlertEvent alertEvent = new AlertEvent(AlertEvent.Direction.BACKWARD, Instant.now(), virtualTrackingTag.getEpc());
+                    log.info(alertEvent.toString());
                     this.publishAlertEvent(alertEvent);
                 }
                 //System.out.println("AREA: 2");

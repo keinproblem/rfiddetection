@@ -11,10 +11,11 @@ import java.time.Instant;
 @ToString
 @EqualsAndHashCode
 @AllArgsConstructor
+@Getter
 public class AlertEvent implements Serializable {
-    @Getter private Direction direction;
-    @Getter private Instant detectionTime;
-    @Getter private byte[] epc;
+    private Direction direction;
+    private Instant detectionTime;
+    private byte[] epc;
 
     private AlertEvent() {
     }

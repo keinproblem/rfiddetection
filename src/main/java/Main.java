@@ -1,19 +1,31 @@
 import connector.AlertEventForwarder;
 import connector.ConnectorStrategy;
-import connector.DummyToFileConnector;
 import connector.PraesentationConnector;
 import core.ApiFacade;
 import core.NurApiWrapper;
 import core.TagTrackingParameter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 
 @Slf4j
 public class Main {
     public static void main(String[] args) {
+        /*Options options = new Options();
+        options.addOption(Option.builder().argName("d").longOpt("devpath").required().build());
+
+        CommandLineParser parser = new DefaultParser();
+        HelpFormatter helpFormatter = new HelpFormatter();
+        try {
+            CommandLine cmd = parser.parse(options, args);
+        } catch (ParseException e) {
+            System.out.println(e.getMessage());
+            helpFormatter.printHelp("sampling-message-client", options);
+            System.exit(1);
+        }*/
+
+
         log.info("Starting RFID Detection");
 
         //final ConnectorStrategy connectorStrategy = new DummyToFileConnector(Paths.get("testfile.txt"));

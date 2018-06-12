@@ -12,19 +12,20 @@ import java.util.concurrent.TimeUnit;
 public class NurApiWrapper implements ApiFacade {
     private final ExecutorService executorService;
     private final CustomTagTracking customTagTracking;
-    private NurApi nurApi;
+    private final NurApi nurApi;
     private boolean isConnected;
 
     public NurApiWrapper(final TagTrackingParameter tagTrackingParameter) {
         this.isConnected = false;
-        this.executorService = Executors.newSingleThreadExecutor();
-        this.customTagTracking = new CustomTagTracking(this.nurApi, tagTrackingParameter);
 
         this.nurApi = new NurApi();
         int nurApiLogLevel = NurApi.LOG_VERBOSE | NurApi.LOG_ERROR | NurApi.LOG_DATA | NurApi.LOG_USER;
         this.nurApi.setLogToStdout(false);
         this.nurApi.setLogLevel(nurApiLogLevel);
         this.nurApi.setListener(new NurApiEventListener());
+
+        this.executorService = Executors.newSingleThreadExecutor();
+        this.customTagTracking = new CustomTagTracking(this.nurApi, tagTrackingParameter);
     }
 
 
