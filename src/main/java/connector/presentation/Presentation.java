@@ -10,7 +10,7 @@ public class Presentation {
 
     public Presentation() {
         JFrame presentationFrame = new JFrame("Studienarbeit Präsentation");
-        presentationFrame.setContentPane(pnlMain);
+        presentationFrame.setContentPane(new JPanel());
         presentationFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         presentationFrame.pack();
         presentationFrame.setVisible(true);

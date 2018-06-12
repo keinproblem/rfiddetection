@@ -1,6 +1,8 @@
 import core.AlertEventListener;
 import core.ApiFacade;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class RfidDetectionService {
     private final ApiFacade apiFacade;
 
@@ -9,7 +11,9 @@ public class RfidDetectionService {
     }
 
     public void init(final String devPath) {
-        this.apiFacade.connect(devPath);
+     	log.debug("Connecting");   
+	this.apiFacade.connect(devPath);
+	log.debug("Init Tracking");
         this.initTagTracking();
     }
 

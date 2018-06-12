@@ -5,7 +5,7 @@ import com.nordicid.nurapi.NurRespInventory;
 import com.nordicid.nurapi.NurTag;
 import com.nordicid.nurapi.NurTagStorage;
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-@Log4j2
+@Slf4j
 public class CustomTagTracking implements Runnable {
     private final AtomicBoolean isRunning;
     private final ConcurrentHashMap<String, VirtualTrackingTag> virtualTrackingTagConcurrentHashMap;
@@ -61,8 +61,9 @@ public class CustomTagTracking implements Runnable {
 
     @Override
     public void run() {
+	
         final NurTagStorage apiStorage = this.nurApi.getStorage();
-
+	this.isRunning.set(true);
         while (isRunning.get()) {
             try {
                 NurRespInventory nurRespInventory = nurApi.inventory();
