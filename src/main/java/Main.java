@@ -1,35 +1,40 @@
 import connector.AlertEventForwarder;
 import connector.ConnectorStrategy;
-import connector.PraesentationConnector;
+import connector.DummyToFileConnector;
+import connector.PresentationConnector;
 import core.ApiFacade;
 import core.NurApiWrapper;
 import core.TagTrackingParameter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.cli.*;
 
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 
 @Slf4j
 public class Main {
     public static void main(String[] args) {
-        /*Options options = new Options();
-        options.addOption(Option.builder().argName("d").longOpt("devpath").required().build());
+        Options options = new Options();
+        options.addOption(Option.builder("d").longOpt("devpath").required(true).hasArg(true).build());
+        options.addOption(Option.builder("demo").longOpt("demo").required(false).hasArg(false).build());
 
         CommandLineParser parser = new DefaultParser();
         HelpFormatter helpFormatter = new HelpFormatter();
+        CommandLine cmd = null;
         try {
-            CommandLine cmd = parser.parse(options, args);
+            cmd = parser.parse(options, args);
         } catch (ParseException e) {
             System.out.println(e.getMessage());
             helpFormatter.printHelp("sampling-message-client", options);
             System.exit(1);
-        }*/
+        }
 
 
         log.info("Starting RFID Detection");
 
-        //final ConnectorStrategy connectorStrategy = new DummyToFileConnector(Paths.get("testfile.txt"));
-        final ConnectorStrategy connectorStrategy = new PraesentationConnector();
+        final ConnectorStrategy connectorStrategy = cmd.hasOption("demo") ? new PresentationConnector() : new DummyToFileConnector(Paths.get("testfile.txt"));
+
         final AlertEventForwarder alertEventForwarder = new AlertEventForwarder(connectorStrategy);
 
         final List<Integer> inAntennas = new LinkedList<>();
@@ -47,6 +52,7 @@ public class Main {
         final RfidDetectionService rfidDetectionService = new RfidDetectionService(apiFacade);
         rfidDetectionService.addExternalAlertEventListener(alertEventForwarder);
         log.info("Starting Service");
-        rfidDetectionService.init("COM3");
+        log.debug("Device Path: " + (cmd == null ? "COM3" : cmd.getOptionValue("devpath")));
+        rfidDetectionService.init(cmd == null ? "COM3" : cmd.getOptionValue("devpath"));
     }
 }

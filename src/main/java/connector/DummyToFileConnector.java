@@ -1,6 +1,7 @@
 package connector;
 
 import core.AlertEvent;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -8,10 +9,12 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Optional;
 
+@Slf4j
 public class DummyToFileConnector implements ConnectorStrategy {
     final Path filePath;
 
     public DummyToFileConnector(Path filePath) {
+        log.debug("Constructing DummyToFileConnector");
         this.filePath = filePath;
     }
 

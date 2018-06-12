@@ -2,14 +2,17 @@ package connector;
 
 import connector.presentation.Presentation;
 import core.AlertEvent;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Optional;
 
-public class PraesentationConnector implements ConnectorStrategy {
+@Slf4j
+public class PresentationConnector implements ConnectorStrategy {
 
-    Presentation presentation;
+    private final Presentation presentation;
 
-    public PraesentationConnector(){
+    public PresentationConnector() {
+        log.debug("Constructing PresentationConnector");
         presentation = new Presentation();
     }
 
