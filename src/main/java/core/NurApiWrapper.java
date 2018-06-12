@@ -49,9 +49,11 @@ public class NurApiWrapper implements ApiFacade {
 
     @Override
     public void initTracking() {
-        if (isConnected)
-            if (!isTagTrackingRunning())
+        if (isConnected){
+            if (!isTagTrackingRunning()){
                 this.executorService.submit(this.customTagTracking);
+	    }
+	}
     }
 
     @Override
