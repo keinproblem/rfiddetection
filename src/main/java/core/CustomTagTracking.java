@@ -83,11 +83,12 @@ public class CustomTagTracking implements Runnable {
                 int antennaId = tag.getAntennaId();
                 Instant now = Instant.now();
                 byte[] epc = tag.getEpc();
-                if (virtualTrackingTagConcurrentHashMap.containsKey(tag.getEpcString())) {
-                    final VirtualTrackingTag tagTrackingEvent = virtualTrackingTagConcurrentHashMap.get(tag.getEpcString());
+                String epcString = tag.getEpcString();
+		if (virtualTrackingTagConcurrentHashMap.containsKey(tag.getEpcString())) {
+                    final VirtualTrackingTag tagTrackingEvent = virtualTrackingTagConcurrentHashMap.get(epcString);
                     this.processAndUpdateVirtualTrackingTag(tagTrackingEvent, antennaId);
                 } else {
-                    final VirtualTrackingTag virtualTrackingTag = new VirtualTrackingTag(epc, now);
+                    final VirtualTrackingTag virtualTrackingTag = new VirtualTrackingTag(epcString, epc, now);
                     virtualTrackingTagConcurrentHashMap.put(tag.getEpcString(), virtualTrackingTag);
                 }
             }
@@ -111,7 +112,7 @@ public class CustomTagTracking implements Runnable {
                     } catch (Exception e) {
                         log.warn("Failed beeping: ", e);
                     }
-                    AlertEvent alertEvent = new AlertEvent(AlertEvent.Direction.FORWARD, Instant.now(), virtualTrackingTag.getEpc());
+                    AlertEvent alertEvent = new AlertEvent(AlertEvent.Direction.FORWARD, Instant.now(), virtualTrackingTag.getEpc(), virtualTrackingTag.getEpcString());
                     log.info(alertEvent.toString());
                     this.publishAlertEvent(alertEvent);
                 }
@@ -127,7 +128,7 @@ public class CustomTagTracking implements Runnable {
                     } catch (Exception e) {
                         log.warn("Failed beeping: ", e);
                     }
-                    AlertEvent alertEvent = new AlertEvent(AlertEvent.Direction.BACKWARD, Instant.now(), virtualTrackingTag.getEpc());
+                    AlertEvent alertEvent = new AlertEvent(AlertEvent.Direction.BACKWARD, Instant.now(), virtualTrackingTag.getEpc(), virtualTrackingTag.getEpcString());
                     log.info(alertEvent.toString());
                     this.publishAlertEvent(alertEvent);
                 }

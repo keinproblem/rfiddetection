@@ -18,19 +18,18 @@ public class PresentationConnector implements ConnectorStrategy {
 
     @Override
     public ConnectorEvent sendAlertEvent(AlertEvent alertEvent) {
-        String imgPath;
-
+	boolean isIn;
         switch (alertEvent.getDirection()){
             case FORWARD:
-                imgPath = "src/connector/presentation/OUT.png";
+                isIn = true;
                 break;
             case BACKWARD:
-                imgPath = "src/connector/presentation/IN.png";
+                isIn = false;
                 break;
             default:
                 return new ConnectorEvent(ConnectorEvent.StatusCode.ERROR, Optional.empty());
         }
-        presentation.updateInformation(imgPath, alertEvent.getEpc().toString(), alertEvent.getDetectionTime().toString());
+        presentation.updateInformation(isIn, alertEvent.getEpcString() , alertEvent.getDetectionTime().toString());
 
         return new ConnectorEvent(ConnectorEvent.StatusCode.SUCCESS, Optional.empty());
     }

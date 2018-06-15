@@ -8,8 +8,12 @@ public class Presentation {
     private JLabel lblImage;
     private JLabel lblEPC;
     private JLabel lblTime;
-
+    private ImageIcon inImageIcon;
+    private ImageIcon outImageIcon;
     public Presentation() {
+	this.inImageIcon = new ImageIcon(getClass().getClassLoader().getResource("IN.png"));
+        this.outImageIcon = new ImageIcon(getClass().getClassLoader().getResource("OUT.png"));
+
         JFrame presentationFrame = new JFrame("Studienarbeit Präsentation");
         presentationFrame.setContentPane(pnlMain);
         presentationFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -17,8 +21,8 @@ public class Presentation {
         presentationFrame.setVisible(true);
     }
 
-    public void updateInformation(String imgPath, String epc, String time) {
-        lblImage.setIcon(new ImageIcon(imgPath));
+    public void updateInformation(boolean isIn, String epc, String time) {
+	lblImage.setIcon(isIn?this.inImageIcon:this.outImageIcon);
         lblEPC.setText(epc);
         lblTime.setText(time);
     }

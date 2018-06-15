@@ -16,6 +16,7 @@ public class AlertEvent implements Serializable {
     private Direction direction;
     private Instant detectionTime;
     private byte[] epc;
+    private String epcString;
 
     private AlertEvent() {
     }
