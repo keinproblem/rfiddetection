@@ -1,8 +1,13 @@
-import core.AlertEventListener;
 import core.ApiFacade;
 import lombok.extern.slf4j.Slf4j;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+/**
+ * This high-level class defines the primary layer of the system logic.
+ * Currently only Tag Tracking initialization is provided on this layer.
+ * A {@link RfidDetectionService} is supplied with an already set-up {@link ApiFacade} implementation.
+ * The service is currently designed to run forever, hence only initialization is provided.
+ */
 @Slf4j
 public class RfidDetectionService {
     private final ApiFacade apiFacade;
@@ -12,14 +17,14 @@ public class RfidDetectionService {
     }
 
     public void init(final String devPath) {
-        log.debug("Connecting");
+        log.info("Initializing System");
         this.apiFacade.connect(devPath);
         log.debug("Init Tracking");
         this.initTagTracking();
     }
 
     /*
-     * TODO; Implement automated antenna tuning
+     * TODO; Implement automated antenna tuning - will be necessary for deployment. should be parametrized in cli args - or some kind of high-level remote command protocol.
      */
     public void autoTuneReader() {
         throw new NotImplementedException();
@@ -30,15 +35,5 @@ public class RfidDetectionService {
      */
     private void initTagTracking() {
         this.apiFacade.initTracking();
-    }
-
-
-    /**
-     * Add an {@link AlertEventListener} which will receive all {@link core.AlertEvent}s
-     *
-     * @param alertEventListener
-     */
-    public void addExternalAlertEventListener(final AlertEventListener alertEventListener) {
-        this.apiFacade.registerAlertEventCallbackListener(alertEventListener);
     }
 }

@@ -8,6 +8,11 @@ import lombok.ToString;
 import java.io.Serializable;
 import java.time.Instant;
 
+/**
+ * This class represents a Alerting Object of a detected directional movement.
+ * It contains basic information for further processing.
+ * It is immutable and should only be considered for on-the-fly analysis or persistent storing.
+ */
 @ToString
 @EqualsAndHashCode
 @AllArgsConstructor
@@ -18,10 +23,10 @@ public class AlertEvent implements Serializable {
     private byte[] epc;
     private String epcString;
 
-    private AlertEvent() {
-    }
-
+    /**
+     * This enum provides defined directions.
+     */
     public enum Direction {
-        FORWARD, BACKWARD;
+        FORWARD, BACKWARD
     }
 }
