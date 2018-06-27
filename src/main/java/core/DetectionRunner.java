@@ -1,10 +1,9 @@
 package core;
 
-import com.nordicid.nurapi.NurApi;
-import com.nordicid.nurapi.NurRespInventory;
-import com.nordicid.nurapi.NurTag;
-import com.nordicid.nurapi.NurTagStorage;
+import com.nordicid.nurapi.*;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
@@ -14,7 +13,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
-public class CustomTagTracking implements Runnable {
+public class DetectionRunner implements Runnable {
     private final AtomicBoolean isRunning;
     private final ConcurrentHashMap<String, VirtualTrackingTag> virtualTrackingTagConcurrentHashMap;
     private final ConcurrentLinkedQueue<AlertEventListener> alertEventListeners;
@@ -22,14 +21,20 @@ public class CustomTagTracking implements Runnable {
     private List<Integer> antennaIdsGateA;
     private List<Integer> antennaIdsGateB;
 
-    public CustomTagTracking(NurApi nurApi, TagTrackingParameter tagTrackingParameter) {
+    @Getter
+    @Setter
+    private boolean isBeepActive;
+
+    public DetectionRunner(final NurApi nurApi, final TagTrackingParameter tagTrackingParameter) {
         this.antennaIdsGateA = tagTrackingParameter.getAntennaIdsGateA();
         this.antennaIdsGateB = tagTrackingParameter.getAntennaIdsGateB();
         this.nurApi = nurApi;
         this.virtualTrackingTagConcurrentHashMap = new ConcurrentHashMap<>();
         this.alertEventListeners = new ConcurrentLinkedQueue<>();
         this.isRunning = new AtomicBoolean(false);
+        this.isBeepActive = false;
     }
+
 
     public AtomicBoolean getIsRunning() {
         return isRunning;
@@ -47,44 +52,47 @@ public class CustomTagTracking implements Runnable {
         this.alertEventListeners.forEach(alertEventListener -> alertEventListener.onAlert(alertEvent));
     }
 
-    public Gate fromAntennaId(final int antennaId) {
-        for (int i : this.antennaIdsGateA) {
-            if (i == antennaId)
-                return Gate.A;
+    private Gate fromAntennaId(final int antennaId) {
+        if (this.antennaIdsGateA.contains(antennaId)) {
+            return Gate.A;
+        } else if (this.antennaIdsGateB.contains(antennaId)) {
+            return Gate.B;
+        } else {
+            return Gate.None;
         }
-        for (int i : this.antennaIdsGateB) {
-            if (i == antennaId)
-                return Gate.B;
-        }
-        return Gate.None;
     }
+
 
     @Override
     public void run() {
-	
         final NurTagStorage apiStorage = this.nurApi.getStorage();
-	this.isRunning.set(true);
+        this.isRunning.set(true);
         while (isRunning.get()) {
+        /*
+            Avoid logging here
+         */
+
             try {
-                NurRespInventory nurRespInventory = nurApi.inventory();
+                final NurRespInventory nurRespInventory = nurApi.inventory();
                 if (nurRespInventory.numTagsFound > 0) {
-                    try {
-                        nurApi.fetchTags(true);
-                    } catch (Exception e) {
-                        //TODO; no tags found
-                    }
+                    nurApi.fetchTags(true);
+                } else {
+                    //No Tags found
+                    //place holder
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (final NurApiException nurApiException) {
+
+            } catch (final Exception exception) {
+                //TODO; no tags found
             }
 
-            for (int n = 0; n < apiStorage.size(); n++) {
+            for (int n = 0; n < apiStorage.size(); ++n) {
                 NurTag tag = apiStorage.get(n);
                 int antennaId = tag.getAntennaId();
                 Instant now = Instant.now();
                 byte[] epc = tag.getEpc();
                 String epcString = tag.getEpcString();
-		if (virtualTrackingTagConcurrentHashMap.containsKey(tag.getEpcString())) {
+                if (virtualTrackingTagConcurrentHashMap.containsKey(tag.getEpcString())) {
                     final VirtualTrackingTag tagTrackingEvent = virtualTrackingTagConcurrentHashMap.get(epcString);
                     this.processAndUpdateVirtualTrackingTag(tagTrackingEvent, antennaId);
                 } else {
@@ -92,6 +100,7 @@ public class CustomTagTracking implements Runnable {
                     virtualTrackingTagConcurrentHashMap.put(tag.getEpcString(), virtualTrackingTag);
                 }
             }
+
             apiStorage.clear();
 
             try {
@@ -106,40 +115,33 @@ public class CustomTagTracking implements Runnable {
         switch (fromAntennaId(antennaId)) {
             case A: {
                 if (virtualTrackingTag.isPassedGateB()) {
-                    //System.out.println("############ DIRECTION 1");
-                    try {
-                        this.nurApi.beep();
-                    } catch (Exception e) {
-                        log.warn("Failed beeping: ", e);
+                    if (isBeepActive) {
+                        this.performStandardBeep();
                     }
-                    AlertEvent alertEvent = new AlertEvent(AlertEvent.Direction.FORWARD, Instant.now(), virtualTrackingTag.getEpc(), virtualTrackingTag.getEpcString());
+                    final AlertEvent alertEvent = new AlertEvent(AlertEvent.Direction.FORWARD, Instant.now(), virtualTrackingTag.getEpc(), virtualTrackingTag.getEpcString());
                     log.info(alertEvent.toString());
                     this.publishAlertEvent(alertEvent);
                 }
-                //System.out.println("AREA: 1");
                 virtualTrackingTag.setPassedGateA(true);
                 virtualTrackingTag.setPassedGateB(false);
             }
             break;
             case B: {
                 if (virtualTrackingTag.isPassedGateA()) {
-                    try {
-                        this.nurApi.beep();
-                    } catch (Exception e) {
-                        log.warn("Failed beeping: ", e);
+                    if (isBeepActive) {
+                        this.performStandardBeep();
                     }
-                    AlertEvent alertEvent = new AlertEvent(AlertEvent.Direction.BACKWARD, Instant.now(), virtualTrackingTag.getEpc(), virtualTrackingTag.getEpcString());
+                    final AlertEvent alertEvent = new AlertEvent(AlertEvent.Direction.BACKWARD, Instant.now(), virtualTrackingTag.getEpc(), virtualTrackingTag.getEpcString());
                     log.info(alertEvent.toString());
                     this.publishAlertEvent(alertEvent);
                 }
-                //System.out.println("AREA: 2");
                 virtualTrackingTag.setPassedGateB(true);
                 virtualTrackingTag.setPassedGateA(false);
             }
             break;
             case None: {
                 //TODO; handle this
-
+                log.debug("Received ");
             }
             break;
             default:
@@ -147,7 +149,17 @@ public class CustomTagTracking implements Runnable {
         }
     }
 
-    public enum Gate {
+    private void performStandardBeep() {
+        try {
+            this.nurApi.beep();
+        } catch (final NurApiException nurApiException) {
+            log.warn("Failed beeping: ", nurApiException);
+        } catch (final Exception exception) {
+            log.warn("Failed beeping: ", exception);
+        }
+    }
+
+    private enum Gate {
         A, B, None
     }
 
