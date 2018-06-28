@@ -96,7 +96,7 @@ public class Main {
 
 
         log.info("Starting Service");
-        final String devPath = cmd.getOptionValue("devpath");
+        final String devPath = cmd.getOptionValue("device-path");
         log.debug("Using device: " + devPath);
         rfidDetectionService.init(devPath);
     }
