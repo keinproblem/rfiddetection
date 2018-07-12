@@ -2,6 +2,7 @@
 
 ROOT_UID=0
 JAVA_VERSION=1.8
+RXTX_FOLDER=./util/rxtx
 RXTX_SHARED_OBJECT_LOCATION=/usr/lib/jni/
 INSTALL_PATH=/opt/RFID_detection/
 LOCAL_INSTALL_FILE=rfid-detection-0.0.1-jar-with-dependencies.jar
@@ -10,6 +11,14 @@ LOCAL_INSTALL_FILE=rfid-detection-0.0.1-jar-with-dependencies.jar
 REPO_URL='https://github.com/keinproblem/rfiddetection'
 ARTIFACT_NAME='rfid-detection-0.0.1-jar-with-dependencies.jar'
 
+#check for correct inputs
+if  [ "$#" != "0" ] && [ "$1" != "-o" ]; then
+    echo "Unsupported input parameter!"
+    echo "Allowed parameter:"
+    echo "-o to use the JAR inside bin, othwise it will download the latest from git"
+    echo "e.g. ./install.sh -o"
+    exit
+fi
 
 #check for correct inputs
 if  [ "$#" != "0" ] && [ "$1" != "-o" ]; then
@@ -91,11 +100,11 @@ if [[ -f /etc/udev/rules.d/99-usb-serial.rules ]]; then
     while read -r newUsbRule; do
         alreadyImplementedRule=0
         while read -r alreadySavedUsbRule; do
-	    if [[ $alreadySavedUsbRule == $newUsbRule ]]
+	    if [[ $alreadySavedUsbRule == $newUsbRule ]]; then
 	        alreadyImplementedRule=1
 	    fi
 	done < "/etc/udev/rules.d/99-usb-serial.rules"
-        if [[ $alreadyImplementedRule == 0 ]]
+        if [[ $alreadyImplementedRule == 0 ]]; then
 	    echo $newUsbRule >> /etc/udev/rules.d/99-usb-serial.rules
         fi
     done < "./util/99-usb-serial.rules"
