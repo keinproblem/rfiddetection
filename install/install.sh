@@ -2,6 +2,7 @@
 
 ROOT_UID=0
 JAVA_VERSION=1.8
+RXTX_FOLDER=./util/rxtx
 RXTX_SHARED_OBJECT_LOCATION=/usr/lib/jni/
 INSTALL_PATH=/opt/RFID_detection/
 LOCAL_INSTALL_FILE=rfid-detection-0.0.1-jar-with-dependencies.jar
@@ -15,7 +16,7 @@ ARTIFACT_NAME='rfid-detection-0.0.1-jar-with-dependencies.jar'
 if  [ "$#" != "0" ] && [ "$1" != "-o" ]; then
     echo "Unsupported input parameter!"
     echo "Allowed parameter:"
-    echo "-o to use the JAR inside bin, othwise it will download the latest from git"
+    echo "-o to use the JAR inside ./bin/, othwise it will download the latest version from git"
     echo "e.g. ./install.sh -o"
     exit
 fi
@@ -32,13 +33,13 @@ unameOut="$(uname -s)"
 case "${unameOut}" in
     Linux*)     machine=Linux;;
     Darwin*)    machine=Mac;;
-    *)          echo "${unameOut} is an unsupported kernel"; exit
+    *)          echo "${unameOut} is an unsupported kernel"; exit;;
 esac
 
 
 # check if java is installed
 if type -p java; then
-    _java=javadwWWWWwww
+    _java=java
 elif [[ -n "${JAVA_HOME}" ]] && [[ -x "${JAVA_HOME}/bin/java" ]];  then     
     _java="${JAVA_HOME}/bin/java"
 else
@@ -59,15 +60,18 @@ fi
 # check if RXTXcomm Library is installed
 case "${machine}" in
     Linux)
-	type=$(uname -m)
-	case "${type}" in
+	machineHardware="$(uname -m)"
+	case "${machineHardware}" in
 		x86) yes | cp -rf ${RXTX_FOLDER}/x86/* ${RXTX_SHARED_OBJECT_LOCATION};;
 		x86_64) yes | cp -rf ${RXTX_FOLDER}/x86_64/* ${RXTX_SHARED_OBJECT_LOCATION};;
+		amd64) yes | cp -rf ${RXTX_FOLDER}/amd64/* ${RXTX_SHARED_OBJECT_LOCATION};;
+		i386) yes | cp -rf ${RXTX_FOLDER}/i386/* ${RXTX_SHARED_OBJECT_LOCATION};;
 		arm*) yes | cp -rf ${RXTX_FOLDER}/armhf/* ${RXTX_SHARED_OBJECT_LOCATION};;
-		*) echo "${type} isn't supported for RXTX Library installation!";;
+		*) echo "Machine Hardware ${machineHardware} isn't supported for RXTX Library installation!";;
 	esac
+	;;
     Mac) yes | cp -rf ${RXTX_FOLDER}/mac/* ${RXTX_SHARED_OBJECT_LOCATION};;
-    *) echo "${machine} isn't supported for RXTX Library installation!";;
+    *) echo "${machine} isn't supported for RXTX Library installation!"; exit;;
 esac
 
 
@@ -76,11 +80,11 @@ if [[ -f /etc/udev/rules.d/99-usb-serial.rules ]]; then
     while read -r newUsbRule; do
         alreadyImplementedRule=0
         while read -r alreadySavedUsbRule; do
-	    if [[ $alreadySavedUsbRule == $newUsbRule ]]
+	    if [[ $alreadySavedUsbRule == $newUsbRule ]]; then
 	        alreadyImplementedRule=1
 	    fi
 	done < "/etc/udev/rules.d/99-usb-serial.rules"
-        if [[ $alreadyImplementedRule == 0 ]]
+        if [[ $alreadyImplementedRule == 0 ]]; then
 	    echo $newUsbRule >> /etc/udev/rules.d/99-usb-serial.rules
         fi
     done < "./util/99-usb-serial.rules"
