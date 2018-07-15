@@ -1,2 +1,0 @@
-SUBSYSTEM=="tty", ATTRS{idVendor}=="04e6", ATTRS{idProduct}=="0112", SYMLINK+="NordicIdSampoS1"
-
